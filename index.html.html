@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day Founder Mastery Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f5f7;
+    color: #1c1c1e;
+    padding: 16px;
+    line-height: 1.5;
+  }
+  .tracker { max-width: 600px; margin: 0 auto; }
+  .tracker-header { text-align: center; margin-bottom: 14px; }
+  .tracker-header h1 { font-size: 22px; font-weight: 600; margin: 0; }
+  .tracker-header p { font-size: 12px; color: #8e8e93; margin: 4px 0 0; }
+
+  .score-bar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding: 12px 16px;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .score-circle {
+    width: 52px; height: 52px; border-radius: 50%; border: 3px solid #1c1c1e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; flex-shrink: 0; transition: all 0.3s ease;
+  }
+  .score-label { font-size: 14px; font-weight: 600; }
+  .score-sub { font-size: 12px; color: #8e8e93; }
+
+  .section {
+    background: #fff; border-radius: 12px; margin-bottom: 12px;
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .section-header {
+    padding: 10px 16px; font-size: 12px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px; color: #fff;
+  }
+  .section-header.p1 { background: #1c1c1e; }
+  .section-header.p2 { background: #636366; }
+  .section-header.p3 { background: #0071e3; }
+  .badge {
+    margin-left: auto; font-size: 10px; padding: 3px 10px;
+    border-radius: 12px; background: rgba(255,255,255,0.2); letter-spacing: 0.5px;
+  }
+
+  .item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 11px 16px; border-bottom: 1px solid #f2f2f7;
+    cursor: pointer; transition: background 0.15s ease;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: #f9f9fb; }
+  .item input[type="checkbox"] {
+    width: 20px; height: 20px; accent-color: #1c1c1e;
+    flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  }
+  .item-text { font-size: 14.5px; line-height: 20px; }
+  .item-text small {
+    display: block; font-size: 12px; color: #8e8e93;
+    margin-top: 2px; line-height: 17px;
+  }
+  .item.done .item-text { text-decoration: line-through; color: #c7c7cc; }
+
+  .day-grid {
+    display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; padding: 12px 16px;
+  }
+  .day-cell {
+    aspect-ratio: 1; border-radius: 8px; border: 1.5px solid #e5e5ea;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s ease; background: #fff; color: #8e8e93;
+  }
+  .day-cell:hover { background: #f2f2f7; }
+  .day-cell.active { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+  .day-cell.completed { background: #34c759; color: #fff; border-color: #34c759; }
+  .day-cell.partial { background: #ff9500; color: #fff; border-color: #ff9500; }
+
+  .resources {
+    padding: 12px 16px; background: #fafafa; border-top: 1px solid #f2f2f7;
+  }
+  .resources-title {
+    font-size: 12px; font-weight: 600; color: #636366;
+    margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .resource-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #3a3a3c; margin-bottom: 6px;
+  }
+  .resource-row:last-child { margin-bottom: 0; }
+  .resource-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 6px; background: #e5e5ea; color: #636366; flex-shrink: 0;
+  }
+
+  .eval-box { padding: 12px 16px; }
+  .eval-box textarea {
+    width: 100%; min-height: 72px; border: 1.5px solid #e5e5ea;
+    border-radius: 10px; padding: 10px 12px; font-family: inherit;
+    font-size: 14px; resize: vertical; background: #fafafa; color: inherit;
+  }
+  .eval-box textarea:focus { outline: none; border-color: #1c1c1e; background: #fff; }
+  .eval-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #636366; }
+
+  .btn-row { display: flex; gap: 10px; padding: 12px 16px; }
+  .btn {
+    flex: 1; padding: 10px 0; border-radius: 10px; border: 1.5px solid #e5e5ea;
+    background: #fff; font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: #1c1c1e; transition: all 0.15s ease;
+  }
+  .btn:hover { background: #f2f2f7; }
+  .btn-primary { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+  .btn-primary:hover { opacity: 0.88; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 12px 16px;
+  }
+  .stat-box { text-align: center; padding: 10px 2px; background: #fafafa; border-radius: 10px; }
+  .stat-num { font-size: 16px; font-weight: 600; }
+  .stat-label { font-size: 9px; color: #8e8e93; margin-top: 3px; font-weight: 500; }
+
+  .week-banner {
+    padding: 8px 16px; background: #0071e3; color: #fff;
+    font-size: 13px; font-weight: 600; text-align: center;
+  }
+
+  .export-row { padding: 0 16px 12px; }
+  .export-btn {
+    width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid #e5e5ea;
+    background: #fff; font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: #1c1c1e;
+  }
+  .export-btn:hover { background: #f2f2f7; }
+
+  @media (max-width: 480px) {
+    .tracker-header h1 { font-size: 20px; }
+    .stats-row { gap: 4px; }
+    .stat-num { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="tracker">
+  <div class="tracker-header">
+    <h1>30-Day Founder Mastery Tracker</h1>
+    <p>Namaz · Sales · Finance · CEO · Productivity · Rules</p>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-circle" id="scoreCircle">0%</div>
+    <div>
+      <div class="score-label">Today's Score</div>
+      <div class="score-sub" id="scoreSub">Build your day, one check at a time</div>
+    </div>
+  </div>
+
+  <!-- DAY SELECTOR -->
+  <div class="section">
+    <div class="section-header p1">Select Day</div>
+    <div class="day-grid" id="dayGrid"></div>
+  </div>
+
+  <!-- WEEKLY BANNER -->
+  <div class="week-banner" id="weekBanner">Week 1 — Foundation</div>
+
+  <!-- PILLAR 1: NAMAZ -->
+  <div class="section">
+    <div class="section-header p1">
+      1. Namaz — Foundation of Barakah
+      <span class="badge">NON-NEGOTIABLE</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Fajr on time + 2 Sunnah <small>Wake before Fajr. Wudu with presence. Pray in congregation if possible.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Dhuhr on time <small>Step away from work. Pray with khushu. Business can wait for Allah.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Asr on time <small>Mid-afternoon reset. Detach from dunya stress before your Lord.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Maghrib on time <small>Sunset gratitude. Thank Allah for today's Rizq, safety, and family.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Isha + Witr before sleep <small>Night prayer cleanses the day. Never skip Witr.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Morning & Evening Adhkar <small>Ayat al-Kursi, 3 Quls, protection duas. Memorize if not yet.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">Quran — minimum 1 page with understanding <small>Read with tafsir, not just recitation. Feed your soul.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="namaz"><div class="item-text">100x Istighfar + 100x Salawat <small>Cleanse the heart. Build connection with Rasul ﷺ.</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>The Productive Muslim</em> — Mohammed Faris</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Purification of the Heart</em> — Hamza Yusuf</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Productive Muslim YouTube channel</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>The Productive Muslim Podcast</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Pray Fajr at mosque for 30 days — it changes your entire day's energy</div>
+    </div>
+  </div>
+
+  <!-- PILLAR 2: SALES CHEAT SHEET -->
+  <div class="section">
+    <div class="section-header p3">
+      2. Sales Cheat Sheet — Daily Actions
+      <span class="badge">REVENUE ENGINE</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Reach out to 20 prospects <small>Calls, WhatsApp, visits. FMCG clients in Jeddah. Non-negotiable number.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Follow up old leads <small>The fortune is in the follow-up. Speed wins. Don't let leads go cold.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Ask for referrals <small>One happy client can open 3 new doors. Ask directly.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Collect testimonials <small>Screenshot praise. Use it in your next pitch. Social proof closes deals.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Close one deal <small>Any size. Momentum beats perfection. A small close is better than a big maybe.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Follow-up closes deals <small>Remember: 80% of sales happen after the 5th follow-up.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Listen more than you speak <small>2 ears, 1 mouth. Understand their pain before you pitch.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="sales"><div class="item-text">Every objection is feedback <small>"Too expensive" = you haven't shown value. Learn, don't argue.</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>SPIN Selling</em> — Neil Rackham (B2B/FMCG bible)</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>The Challenger Sale</em> — Matthew Dixon</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Never Split the Difference</em> — Chris Voss (FBI negotiation)</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Jordan Belfort Straight Line Sales (YouTube)</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>The Advanced Selling Podcast</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Track "prospect touches" like prayer — daily, non-negotiable. 20/day = 600/month.</div>
+    </div>
+  </div>
+
+  <!-- PILLAR 3: STARTUP FINANCIAL RULES -->
+  <div class="section">
+    <div class="section-header p3">
+      3. Financial Rules — Strong Finances, Strong Startup
+      <span class="badge">SURVIVAL</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Know your runway <small>How many months can you survive if income drops 50%? Know the number.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Track CAC (Customer Acquisition Cost) <small>How much does it cost to get one new client? Include time + money.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Track LTV (Lifetime Value) <small>How much will one client spend over 1 year? LTV must be > 3x CAC.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Keep emergency cash <small>3–6 months of expenses in reserve. No exceptions.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Separate business & personal money <small>Two wallets, two accounts, two mental books. Never mix.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Red flag check: Burn vs Revenue <small>Are you spending faster than you earn? If yes, stop and fix.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Red flag check: Monthly reporting <small>Did you review P&L this week? No reporting = flying blind.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Red flag check: Know your numbers <small>Founder who doesn't know numbers is not a founder. Cash in bank. Today.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Record all cash in/out <small>Salman = Cash Out, Mahroos = Cash In. Zero "Misc" entries in VIK Books.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="finance"><div class="item-text">Cash forecast for next 7 days <small>Who owes you? Who do you owe? Predict before it hurts.</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Profit First</em> — Mike Michalowicz (fixes cash flow)</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Financial Intelligence for Entrepreneurs</em> — Karen Berman</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Y Combinator Startup School (free on YouTube)</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>The Twenty Minute VC</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Build a simple "Cash Dashboard" in Excel. Revenue - Expenses = Runway. Look at it every morning.</div>
+    </div>
+  </div>
+
+  <!-- PILLAR 4: CEO CHECKLIST -->
+  <div class="section">
+    <div class="section-header p2">
+      4. CEO Checklist — Lead Like a Founder
+      <span class="badge">SYSTEMS</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Revenue Dashboard review <small>What did we sell today? What's the trend? Look at numbers first.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Cash in Bank check <small>Exact number. Not "around." Exact. Know it like you know your name.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Today's Top 3 Priorities <small>Not 10. Three needle-movers. Write them. Execute them.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Biggest Customer Problem <small>Which client is unhappy? Why? Fix it before they leave.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">One Sales Activity <small>One call, one visit, one follow-up. Every single day. No zero days.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Review Expenses <small>Where is money leaking? Cut one unnecessary cost this week.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Team / Family alignment <small>Evening update — what happened today? What's tomorrow's plan?</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Product / Service Roadmap check <small>What's next for your FMCG line? Cardamom export timeline?</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Marketing Performance <small>Which channel brought leads? Double down on what works. Kill what doesn't.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Wins & Failures reflection <small>What worked? What broke? Be honest. No blame, just learning.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Customer Feedback loop <small>Ask one client: "How can we serve you better?" Listen. Act.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="ceo"><div class="item-text">Next Week Goals set <small>Friday planning. 3 big rocks for next week. Not tasks — outcomes.</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>High Output Management</em> — Andy Grove (Intel CEO)</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>The Hard Thing About Hard Things</em> — Ben Horowitz</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Extreme Ownership</em> — Jocko Willink</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Patrick Bet-David "1-on-1 CEO Meetings"</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>How I Built This — Guy Raz</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Do your "CEO Review" every Friday after Jumuah. Spiritual + business reset in one.</div>
+    </div>
+  </div>
+
+  <!-- PILLAR 5: PRODUCTIVITY SYSTEM -->
+  <div class="section">
+    <div class="section-header p2">
+      5. Productivity System — Work Smart, Focus Deep
+      <span class="badge">LEVERAGE</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Use Calendar religiously <small>Block time for salah, sales calls, deep work. If it's not scheduled, it doesn't exist.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Use Notion / Notes for ideas <small>Capture everything. A forgotten idea is a lost opportunity.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Use CRM or client list <small>Track every prospect, every follow-up, every deal stage. No mental notes.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Use Password Manager <small>Stop wasting 10 minutes searching for passwords. 1Password or Bitwarden.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Use AI Assistant <small>ChatGPT for drafting emails, analyzing numbers, planning content. 10x your output.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Take Meeting Notes <small>Every supplier meeting, every client call. Documented = actionable.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Avoid random notifications <small>Turn off all non-essential alerts. Your attention is your most valuable asset.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Avoid endless meetings <small>If it can be a WhatsApp message, don't meet. Time is money.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Avoid multitasking <small>One thing at a time. Deep work > scattered effort. Quality over quantity.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Avoid constant context switching <small>Finish the email. Then make the call. Then visit the client. Not all at once.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="productivity"><div class="item-text">Avoid busy work <small>Ask: "Does this task make money or move the needle?" If no, drop it.</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Deep Work</em> — Cal Newport</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Atomic Habits</em> — James Clear</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Essentialism</em> — Greg McKeown</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Ali Abdaal productivity system (YouTube)</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>Cortex (CGP Grey + Myke Hurley)</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Use WhatsApp "Saved Messages" as your quick inbox — you're already on WhatsApp for business.</div>
+    </div>
+  </div>
+
+  <!-- PILLAR 6: FOUNDER RULES -->
+  <div class="section">
+    <div class="section-header p2">
+      6. Founder Rules — Simple Rules, Big Impact
+      <span class="badge">MINDSET</span>
+    </div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Build before announcing <small>Don't post about your cardamom export until the first shipment is ready. Execute first.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Sell before scaling <small>Get 3 paying clients before you rent an office. Validation > vanity.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Hire slow <small>Your first employee is your biggest risk. Test with tasks before commitment.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Fire fast <small>If someone drains energy or steals, remove them immediately. Poison spreads.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Document everything <small>Every deal, every term, every promise. Verbal agreements are broken agreements.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Protect your reputation <small>In Jeddah and Kerala, your name is your brand. One lie destroys years of trust.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Focus on one thing <small>FMCG in Jeddah + Cardamom export. That's it. No new side hustles for 30 days.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="rules"><div class="item-text">Play long-term <small>You're building for Kerala, not just Jeddah. Every decision: does it help the 5-year plan?</small></div></label>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Learn More</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>The Almanack of Naval Ravikant</em></div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>Zero to One</em> — Peter Thiel</div>
+      <div class="resource-row"><span class="resource-tag">Book</span><em>The $100 Startup</em> — Chris Guillebeau</div>
+      <div class="resource-row"><span class="resource-tag">Video</span>Naval Ravikant interviews on YouTube</div>
+      <div class="resource-row"><span class="resource-tag">Podcast</span>My First Million</div>
+      <div class="resource-row"><span class="resource-tag">Tip</span>Write your Founder Rules on paper and stick it in your car. See it before every sales visit.</div>
+    </div>
+  </div>
+
+  <!-- EVENING REVIEW -->
+  <div class="section">
+    <div class="section-header p1">Evening Review — Evaluate & Improve</div>
+    <div class="card-body">
+      <label class="item"><input type="checkbox" data-cat="review"><div class="item-text">Revenue Generated today <small>How much cash came in? Write the number. No guessing.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="review"><div class="item-text">Lessons Learned <small>What broke? What worked? One sentence. No novels.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="review"><div class="item-text">Team / Family Update <small>Share one thing with your family. They are your real board of directors.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="review"><div class="item-text">Tomorrow's Plan <small>Top 3 priorities for tomorrow. Write them before sleep. Wake up with clarity.</small></div></label>
+      <label class="item"><input type="checkbox" data-cat="review"><div class="item-text">One Improvement <small>1% better every day compounds to 37x in a year. What's your 1% today?</small></div></label>
+    </div>
+    <div class="eval-box">
+      <div class="eval-label">Today's Reflection:</div>
+      <textarea id="reflection" placeholder="How did my salah affect my business today? Which sales tactic worked? What financial number surprised me? What will I do differently tomorrow?"></textarea>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="section">
+    <div class="section-header p1">30-Day Progress</div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stNamaz">0</div><div class="stat-label">Namaz</div></div>
+      <div class="stat-box"><div class="stat-num" id="stSales">0</div><div class="stat-label">Sales</div></div>
+      <div class="stat-box"><div class="stat-num" id="stFinance">0</div><div class="stat-label">Finance</div></div>
+      <div class="stat-box"><div class="stat-num" id="stCeo">0</div><div class="stat-label">CEO</div></div>
+      <div class="stat-box"><div class="stat-num" id="stProductivity">0</div><div class="stat-label">Productivity</div></div>
+      <div class="stat-box"><div class="stat-num" id="stRules">0</div><div class="stat-label">Rules</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="clearDay()">Reset Day</button>
+      <button class="btn btn-primary" onclick="saveDay()">Save Day</button>
+    </div>
+    <div class="export-row">
+      <button class="export-btn" onclick="exportData()">📥 Export 30-Day Data (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TOTAL_DAYS = 30;
+  let currentDay = 1;
+  let dayData = {};
+  for (let i = 1; i <= TOTAL_DAYS; i++) dayData[i] = { checks: {}, reflection: '' };
+
+  const catTotals = { namaz: 8, sales: 8, finance: 10, ceo: 12, productivity: 11, rules: 8, review: 5 };
+  const catKeys = Object.keys(catTotals);
+  const weekNames = ['Foundation','Momentum','Discipline','Transformation'];
+
+  function renderDays() {
+    const grid = document.getElementById('dayGrid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= TOTAL_DAYS; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell' + (i === currentDay ? ' active' : '');
+      cell.textContent = i;
+      const d = dayData[i];
+      const totalChecks = catKeys.reduce((s, k) => s + popcount(d.checks[k] || 0), 0);
+      const totalItems = catKeys.reduce((s, k) => s + catTotals[k], 0);
+      if (totalChecks === totalItems && totalChecks > 0) cell.classList.add('completed');
+      else if (totalChecks > 0) cell.classList.add('partial');
+      cell.onclick = () => loadDay(i);
+      grid.appendChild(cell);
+    }
+    const weekNum = Math.min(4, Math.ceil(currentDay / 7));
+    document.getElementById('weekBanner').textContent = 'Week ' + weekNum + ' — ' + weekNames[weekNum - 1];
+  }
+
+  function popcount(n) { let c = 0; while (n) { c++; n &= n - 1; } return c; }
+
+  function loadDay(day) {
+    currentDay = day;
+    const d = dayData[day];
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const cat = cb.dataset.cat;
+      const idx = [...cb.closest('.card-body').querySelectorAll('input[data-cat="' + cat + '"]')].indexOf(cb);
+      cb.checked = !!((d.checks[cat] || 0) & (1 << idx));
+      cb.closest('.item').classList.toggle('done', cb.checked);
+    });
+    document.getElementById('reflection').value = d.reflection || '';
+    updateScore();
+    renderDays();
+  }
+
+  function updateScore() {
+    const d = dayData[currentDay];
+    let totalChecked = 0, totalItems = 0;
+    catKeys.forEach(k => {
+      const checked = popcount(d.checks[k] || 0);
+      totalChecked += checked;
+      totalItems += catTotals[k];
+      const el = document.getElementById('st' + k.charAt(0).toUpperCase() + k.slice(1));
+      if (el) el.textContent = checked + '/' + catTotals[k];
+    });
+    const pct = totalItems ? Math.round((totalChecked / totalItems) * 100) : 0;
+    document.getElementById('scoreCircle').textContent = pct + '%';
+    document.getElementById('scoreSub').textContent = totalChecked + ' of ' + totalItems + ' items checked';
+    const circle = document.getElementById('scoreCircle');
+    if (pct >= 80) { circle.style.borderColor = '#34c759'; circle.style.color = '#34c759'; }
+    else if (pct >= 50) { circle.style.borderColor = '#ff9500'; circle.style.color = '#ff9500'; }
+    else { circle.style.borderColor = '#1c1c1e'; circle.style.color = '#1c1c1e'; }
+  }
+
+  function saveChecks() {
+    const d = dayData[currentDay];
+    catKeys.forEach(k => {
+      const boxes = document.querySelectorAll('input[data-cat="' + k + '"]');
+      let mask = 0;
+      boxes.forEach((cb, i) => { if (cb.checked) mask |= (1 << i); });
+      d.checks[k] = mask;
+    });
+    d.reflection = document.getElementById('reflection').value;
+  }
+
+  function saveDay() {
+    saveChecks();
+    updateScore();
+    renderDays();
+  }
+
+  function clearDay() {
+    dayData[currentDay] = { checks: {}, reflection: '' };
+    loadDay(currentDay);
+  }
+
+  function exportData() {
+    saveChecks();
+    let csv = 'Day,Namaz,Sales,Finance,CEO,Productivity,Rules,Review,Reflection\n';
+    for (let i = 1; i <= TOTAL_DAYS; i++) {
+      const d = dayData[i];
+      const row = [i];
+      catKeys.forEach(k => row.push(popcount(d.checks[k] || 0)));
+      row.push('"' + (d.reflection || '').replace(/"/g, '""') + '"');
+      csv += row.join(',') + '\n';
+    }
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = '30-day-founder-mastery.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      this.closest('.item').classList.toggle('done', this.checked);
+      saveChecks(); updateScore();
+    });
+  });
+
+  document.getElementById('reflection').addEventListener('input', saveChecks);
+
+  renderDays(); loadDay(1);
+</script>
+
+</body>
+</html>
